@@ -13,7 +13,7 @@ FLOAT-ABI = -mfloat-abi=hard
 MCU = $(CPU) -mthumb $(FPU) $(FLOAT-ABI)
 
 # Path to the STM32 codebase, make sure to update the submodule to get the code
-VENDOR_ROOT = ./bsp/
+VENDOR_ROOT = ./STM32CubeF4/
 
 # Project specific
 SRC_DIR = ./src/
