@@ -16,8 +16,8 @@ MCU = $(CPU) -mthumb $(FPU) $(FLOAT-ABI)
 VENDOR_ROOT = ./STM32CubeF4/
 
 # Project specific
-SRC_DIR = ./src/
-INC_DIR = ./inc/
+SRC_DIR = ./UserApp/
+INC_DIR = ./Configs/
 
 # Outputs
 BINMAP = $(NAME).map
@@ -111,7 +111,6 @@ vpath %.S $(SRC_PATHS)
 
 # Project includes
 INCLUDES = -I$(INC_DIR)
-INCLUDES += -I$(INC_DIR)hal/
 
 # Vendor includes
 INCLUDES += -I$(VENDOR_ROOT)Middlewares/Third_Party/FreeRTOS/Source
@@ -144,7 +143,7 @@ CFLAGS = -c $(OPTFLAGS) $(MCFLAGS) $(FFLAGS) $(WFLAGS) $(DEFINES) $(INCLUDES)
 CXXFLAGS = -c $(OPTFLAGS) $(MCFLAGS) $(FFLAGS) $(WFLAGS) $(DEFINES) $(INCLUDES) -std=c++11
 
 # LINKER FLAGS
-LDSCRIPT = $(SRC_DIR)device/stm32f429xG.ld
+LDSCRIPT = LinkScript/stm32f429xG.ld
 LDFLAGS = -T $(LDSCRIPT)
 LDFLAGS += $(MCFLAGS)
 LDFLAGS += $(FFLAGS)
