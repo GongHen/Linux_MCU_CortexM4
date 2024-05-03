@@ -1,13 +1,31 @@
 #include <stdio.h>
 #include "stm32f4xx_hal.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "cmsis_os.h"
 
 static UART_HandleTypeDef huart1;
 
+/* GetIdleTaskMemory prototype (linked to static allocation support) */
+void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize );
+static StaticTask_t xIdleTaskTCBBuffer;
+static StackType_t xIdleStack[configMINIMAL_STACK_SIZE];
+
+void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize )
+{
+  *ppxIdleTaskTCBBuffer = &xIdleTaskTCBBuffer;
+  *ppxIdleTaskStackBuffer = &xIdleStack[0];
+  *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
+}
+
+
 int __io_putchar(int ch);
-int _write(int file,char *ptr, int len);
 static void SystemClock_Config(void);
 static void MX_USART1_UART_Init(void);
 static void Error_Handler(void);
+
+osThreadId AlgorithmHandle;
+void Algorithm_Thread(void const * argument);
 
 int main(void)
 {
@@ -27,13 +45,28 @@ int main(void)
 
     /* Configure UART for printf */
     MX_USART1_UART_Init();
-    printf("Hello World!\r\n");
+    // osKernelInitialize();
+
+    osThreadDef(Algorithm, Algorithm_Thread, osPriorityNormal, 0, 1024);
+    AlgorithmHandle = osThreadCreate(osThread(Algorithm), NULL);
+
+    /* Start scheduler */
+    osKernelStart();
 
     while (1)
     {
-        printf("Hello World!\r\n");
-        HAL_Delay(1000);
+
     }
+}
+
+
+void Algorithm_Thread(void const * argument)
+{
+  for(;;)
+  {
+    printf("Hello World!\r\n");
+	  osDelay(5000);
+  }
 }
 
 int __io_putchar(int ch)
@@ -43,21 +76,10 @@ int __io_putchar(int ch)
     return ch;
 }
 
-int _write(int file, char *ptr, int len)
-{
-    /* Send chars over UART */
-    for (int i = 0; i < len; i++)
-    {
-        (void) __io_putchar(*ptr++);
-    }
-
-    return len;
-}
-
-void SysTick_Handler(void)
-{
-    HAL_IncTick();
-}
+// void SysTick_Handler(void)
+// {
+//     HAL_IncTick();
+// }
 
 
 static void SystemClock_Config(void)
@@ -100,6 +122,7 @@ static void SystemClock_Config(void)
     Error_Handler();
   }
 }
+
 static void MX_USART1_UART_Init(void)
 {
   huart1.Instance = USART1;
@@ -127,16 +150,16 @@ static void MX_USART1_UART_Init(void)
   * @retval None
   */
 
-void HAL_Delay(__IO uint32_t Delay)
-{
-  while(Delay) 
-  {
-    if (SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) 
-    {
-      Delay--;
-    }
-  }
-}
+// void HAL_Delay(__IO uint32_t Delay)
+// {
+//   while(Delay) 
+//   {
+//     if (SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) 
+//     {
+//       Delay--;
+//     }
+//   }
+// }
 
 static void Error_Handler(void)
 {

@@ -74,6 +74,20 @@ SRCS += $(VENDOR_ROOT)Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c
 SRCS += $(VENDOR_ROOT)Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c
 SRCS += $(VENDOR_ROOT)Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c
 
+# RTOS Kernel
+SRCS += $(VENDOR_ROOT)Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c
+SRCS += $(VENDOR_ROOT)Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c
+SRCS += $(VENDOR_ROOT)Middlewares/Third_Party/FreeRTOS/Source/tasks.c
+SRCS += $(VENDOR_ROOT)Middlewares/Third_Party/FreeRTOS/Source/queue.c
+SRCS += $(VENDOR_ROOT)Middlewares/Third_Party/FreeRTOS/Source/event_groups.c
+SRCS += $(VENDOR_ROOT)Middlewares/Third_Party/FreeRTOS/Source/list.c
+SRCS += $(VENDOR_ROOT)Middlewares/Third_Party/FreeRTOS/Source/stream_buffer.c
+SRCS += $(VENDOR_ROOT)Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c
+SRCS += $(VENDOR_ROOT)Middlewares/Third_Party/FreeRTOS/Source/croutine.c
+SRCS += $(VENDOR_ROOT)Middlewares/Third_Party/FreeRTOS/Source/timers.c
+
+# 如何一句代码包含同一路径下的的c文件
+
 
 # List of directories that contain source code
 SRC_PATHS = $(sort $(dir $(SRCS)))
@@ -89,6 +103,7 @@ OBJS = $(subst .s,.o,$(subst .S,.o,$(subst .c,.o,$(subst .cpp,.o,$(addprefix $(O
 #$(info SRC_PATHS=$(SRC_PATHS))
 
 # Where to find source files.
+# %表示通配符
 vpath %.cpp $(SRC_PATHS)
 vpath %.c $(SRC_PATHS)
 vpath %.s $(SRC_PATHS)
@@ -99,6 +114,10 @@ INCLUDES = -I$(INC_DIR)
 INCLUDES += -I$(INC_DIR)hal/
 
 # Vendor includes
+INCLUDES += -I$(VENDOR_ROOT)Middlewares/Third_Party/FreeRTOS/Source
+INCLUDES += -I$(VENDOR_ROOT)Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
+INCLUDES += -I$(VENDOR_ROOT)Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS
+INCLUDES += -I$(VENDOR_ROOT)Middlewares/Third_Party/FreeRTOS/Source/include
 INCLUDES += -I$(VENDOR_ROOT)Drivers/CMSIS/Core/Include
 INCLUDES += -I$(VENDOR_ROOT)Drivers/CMSIS/Device/ST/STM32F4xx/Include
 INCLUDES += -I$(VENDOR_ROOT)Drivers/STM32F4xx_HAL_Driver/Inc
@@ -151,6 +170,31 @@ release: $(OUTPATH)/$(BINHEX) $(OUTPATH)/$(BINBIN) $(OUTPATH)/$(BINCRC)
 $(OUTPATH):
 	mkdir -p $(OUTPATH)
 
+# compile
+$(OUTPATH)/%.o : %.cpp
+	@echo "[CC] $@"
+	$(CXX) $(CXXFLAGS) $< -o $@
+
+$(OUTPATH)/%.o : %.c
+	@echo "[CC] $@"
+	@$(CC) $(CFLAGS) -c $< -o $@
+# $(CC) $(CFLAGS) $< -o $@
+
+$(OUTPATH)/%.o : %.s
+	@echo "[CC] $@"
+	$(CC) $(CFLAGS) -c $< -o $@
+# $(CC) $(CFLAGS) $< -o $@
+
+## Link
+# C linking is used. If C++ linker is required, change:
+#   $(CC) $(OBJS) $(LDFLAGS) -o $@
+# to:
+#   $(CXX) $(OBJS) $(LDFLAGS) -o $@
+#
+$(OUTPATH)/$(BINELF): $(OBJS)
+	$(CC) $(OBJS) $(LDFLAGS) -o $@
+	$(SIZE) $(OUTPATH)/$(BINELF)
+
 $(OUTPATH)/$(BINHEX): $(OUTPATH)/$(BINELF)
 	@echo "[LD] $@"
 	$(OBJCOPY) -O ihex $< $@
@@ -162,30 +206,6 @@ $(OUTPATH)/$(BINBIN): $(OUTPATH)/$(BINELF)
 # $(OUTPATH)/$(BINCRC): $(OUTPATH)/$(BINBIN)
 # 	cksum < $< > $@
 
-##
-# C linking is used. If C++ linker is required, change:
-#   $(CC) $(OBJS) $(LDFLAGS) -o $@
-# to:
-#   $(CXX) $(OBJS) $(LDFLAGS) -o $@
-#
-$(OUTPATH)/$(BINELF): $(OBJS)
-	$(CC) $(OBJS) $(LDFLAGS) -o $@
-	$(SIZE) $(OUTPATH)/$(BINELF)
-
-$(OUTPATH)/%.o : %.cpp
-	$(CXX) $(CXXFLAGS) $< -o $@
-
-$(OUTPATH)/%.o : %.c
-	@echo "[CC] $@"
-	@$(CC) $(CFLAGS) -c $< -o $@
-# $(CC) $(CFLAGS) $< -o $@
-
-$(OUTPATH)/%.o : %.s
-	$(CC) $(CFLAGS) -c $< -o $@
-# $(CC) $(CFLAGS) $< -o $@
-
-$(OUTPATH)/%.o : %.S
-	$(CC) $(CFLAGS) $< -o $@
 
 clean:
 	rm -f $(OBJS)
