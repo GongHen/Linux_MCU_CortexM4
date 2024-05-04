@@ -5,11 +5,13 @@
 #include "cmsis_os.h"
 #include "usart.h"
 #include "clock.h"
+#include "ulog.h"
 
 
 osThreadId AlgorithmHandle;
 void Algorithm_Thread(void const * argument);
 
+/* main entry*/
 int main(void)
 {
     /* HAL initialization */
@@ -40,7 +42,7 @@ void Algorithm_Thread(void const * argument)
 {
   for(;;)
   {
-    printf("Hello World!\r\n");
+    print_console("Hello World!\r\n");
 	  osDelay(5000);
   }
 }

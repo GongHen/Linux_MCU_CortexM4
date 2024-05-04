@@ -61,7 +61,7 @@ SRCS = $(wildcard $(SRC_DIR)*.c) $(wildcard $(SRC_DIR)*/*.c)
 
 # Drivers
 # Startup
-SRCS += $(VENDOR_ROOT)Drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc/startup_stm32f429xx.s
+SRCS += ./Startup/startup_stm32f429xx.s
 SRCS += $(VENDOR_ROOT)Drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/system_stm32f4xx.c
 SRCS += $(VENDOR_ROOT)Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c
 SRCS += $(VENDOR_ROOT)Drivers/STM32F7xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c
