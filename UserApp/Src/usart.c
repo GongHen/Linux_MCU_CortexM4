@@ -40,9 +40,9 @@ PUTCHAR_PROTOTYPE
   return ch;
 }
 
-void HAL_UART_ErrorCallback(UART_HandleTypeDef *UartHandle)
-{
-}
+// void HAL_UART_ErrorCallback(UART_HandleTypeDef *UartHandle)
+// {
+// }
 
 static int inHandlerMode (void)
 {

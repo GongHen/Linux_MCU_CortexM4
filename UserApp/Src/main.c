@@ -1,7 +1,5 @@
 #include <stdio.h>
-#include "stm32f4xx_hal.h"
-#include "FreeRTOS.h"
-#include "task.h"
+#include "main.h"
 #include "cmsis_os.h"
 #include "usart.h"
 #include "clock.h"
@@ -23,6 +21,7 @@ int main(void)
 
     /* Configure UART for printf */
     uart_console_init(115200);
+    print_console("Hello World!\r\n");
     // osKernelInitialize();
 
     osThreadDef(Algorithm, Algorithm_Thread, osPriorityNormal, 0, 1024);
@@ -30,7 +29,6 @@ int main(void)
 
     /* Start scheduler */
     osKernelStart();
-
     while (1)
     {
 
@@ -40,10 +38,15 @@ int main(void)
 
 void Algorithm_Thread(void const * argument)
 {
+  // uint32_t PreviousWakeTime = 0;
+  uint32_t count = 0;
+
   for(;;)
   {
-    print_console("Hello World!\r\n");
-	  osDelay(5000);
+      // PreviousWakeTime = osKernelSysTick();
+
+      print_console("Algorithm thread lock, ==%d==!\r\n", ++count);
+	    osDelay(5000);
   }
 }
 
@@ -54,9 +57,10 @@ void Error_Handler(void)
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
-  while (1)
-  {
-  }
+  print_console("Error Handler\r\n");
+  // while (1)
+  // {
+  // }
   /* USER CODE END Error_Handler_Debug */
 }
 
