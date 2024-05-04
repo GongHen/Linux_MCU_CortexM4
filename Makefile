@@ -56,6 +56,8 @@ endif
 
 # Project sources
 SRCS = $(wildcard $(SRC_DIR)*.c) $(wildcard $(SRC_DIR)*/*.c)
+# SRCS += ./UserApp/Src/stm32f4xx_hal_msp.c
+# SRCS += ./UserApp/Src/usart.c
 
 # Drivers
 # Startup
@@ -87,7 +89,17 @@ SRCS += $(VENDOR_ROOT)Middlewares/Third_Party/FreeRTOS/Source/croutine.c
 SRCS += $(VENDOR_ROOT)Middlewares/Third_Party/FreeRTOS/Source/timers.c
 
 # 如何一句代码包含同一路径下的的c文件
+# DIR_DRIVERS     += ./STM32CubeF4/Drivers/STM32F4xx_HAL_Driver/Src/
+# DIR_DRIVERS     += ./STM32CubeF4/Drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/
 
+# DIR_FREERTOS    += ./STM32CubeF4/Middlewares/Third_Party/FreeRTOS/Source/
+# DIR_FREERTOS    += ./STM32CubeF4/Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/
+# DIR_FREERTOS    += ./STM32CubeF4/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/
+
+# SRCS   += $(wildcard $(addsuffix *.c, $(DIR_DRIVERS)))
+# SRCS   += $(wildcard $(addsuffix *.c, $(DIR_FREERTOS)))
+# SRCS   += $(wildcard ../UserApp/*.c)
+# SRCS   += $(VENDOR_ROOT)Drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc/startup_stm32f429xx.s
 
 # List of directories that contain source code
 SRC_PATHS = $(sort $(dir $(SRCS)))
@@ -111,6 +123,7 @@ vpath %.S $(SRC_PATHS)
 
 # Project includes
 INCLUDES = -I$(INC_DIR)
+INCLUDES += -I./UserApp/Inc
 
 # Vendor includes
 INCLUDES += -I$(VENDOR_ROOT)Middlewares/Third_Party/FreeRTOS/Source
@@ -138,12 +151,14 @@ DEFINES += -DUSE_HAL_DRIVER
 
 # LIBS = -lm
 
-# CFLAGS
+# (CFLAGS)的内容为编译信息和一部分的编译选项
 CFLAGS = -c $(OPTFLAGS) $(MCFLAGS) $(FFLAGS) $(WFLAGS) $(DEFINES) $(INCLUDES)
 CXXFLAGS = -c $(OPTFLAGS) $(MCFLAGS) $(FFLAGS) $(WFLAGS) $(DEFINES) $(INCLUDES) -std=c++11
 
 # LINKER FLAGS
 LDSCRIPT = LinkScript/stm32f429xG.ld
+
+# (LDFLAGS)是链接选项和链接脚本
 LDFLAGS = -T $(LDSCRIPT)
 LDFLAGS += $(MCFLAGS)
 LDFLAGS += $(FFLAGS)
