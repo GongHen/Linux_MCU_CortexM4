@@ -18,6 +18,13 @@
                 "args": [
                     "clean"
                 ] 
+            },
+            {
+                "label": "rtt",
+                "type": "shell",
+                "command": "JLinkRTTClient.exe",
+                "args": [],
+                "problemMatcher": []
             }
         ]
 }

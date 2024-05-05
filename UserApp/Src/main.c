@@ -4,6 +4,7 @@
 #include "usart.h"
 #include "clock.h"
 #include "ulog.h"
+#include "rtt_log.h"
 
 
 osThreadId AlgorithmHandle;
@@ -21,7 +22,8 @@ int main(void)
 
     /* Configure UART for printf */
     uart_console_init(115200);
-    print_console("Hello World!\r\n");
+    // print_console("Hello World!\r\n");
+    LOGI("Hello STM32!\r\n");
     // osKernelInitialize();
 
     osThreadDef(Algorithm, Algorithm_Thread, osPriorityNormal, 0, 1024);
@@ -45,7 +47,7 @@ void Algorithm_Thread(void const * argument)
   {
       // PreviousWakeTime = osKernelSysTick();
 
-      print_console("Algorithm thread lock, ==%d==!\r\n", ++count);
+      // print_console("Algorithm thread lock, ==%d==!\r\n", ++count);
 	    osDelay(5000);
   }
 }
